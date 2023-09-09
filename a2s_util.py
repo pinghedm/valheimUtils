@@ -51,7 +51,6 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--return_format", choices=["exit_code", "json"])
     parser.add_argument("-n", "--notify", action="store_true")
     args = parser.parse_args()
-    notify_file_name = args.notify_file
     try:
         res = get_server_info(args.method or "info")
         write_notify_file([])
