@@ -73,6 +73,8 @@
             } else {
                 setDisplay('#server-up', 'none')
                 setDisplay('#server-down', 'block')
+                setDisplay('#players', 'none')
+                setDisplay('#no-players', 'none')
             }
 
             if (data.numPlayers) {
@@ -81,7 +83,7 @@
                 document.querySelectorAll("#player-count").forEach((el) => {
                     el.innerHTML = data.numPlayers;
                 });
-            } else {
+            } else if (!data.numPlayers && data.serverUp) {
                 setDisplay('#players', 'none')
                 setDisplay('#no-players', 'block')
             }
