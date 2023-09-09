@@ -68,7 +68,7 @@
         const getInfo = async () => {
             const res = await fetch("http://127.0.0.1:8000/get_info");
             const data = await res.json();
-            setDisplay('loading', 'none')
+            setDisplay('#loading', 'none')
             if (data.serverUp) {
                 setDisplay('#server-up', 'block')
                 setDisplay('#server-down', 'none')
