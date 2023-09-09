@@ -60,7 +60,7 @@ if __name__ == "__main__":
             print(json.dumps(dict(res)))
     except Exception as e:
         already_notified = notify_file_has_data()
-        if not args.notify and not already_notified:
+        if args.notify and not already_notified:
             res = send_discord_message(
                 f"<@{ANTHONY_ID}>: Looks like the server is down!  (Also, <@{DANNY_ID}> pay attention, in case I am malfunctioning)"
             )
