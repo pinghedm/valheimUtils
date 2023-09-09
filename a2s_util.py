@@ -7,7 +7,7 @@ import datetime
 
 import a2s
 import requests
-from private_data import address, webhook_url, ANTHONY_ID, DANNY_ID
+from private_data import address, webhook_url, ANTHONY_ID, DANNY_ID, notify_file_path
 
 
 def send_discord_message(message):
@@ -33,37 +33,43 @@ def get_server_info(func_name="info", ret_attr=None):
     return ret
 
 
+def write_notify_file(data):
+    with open(notify_file_path, "w", encoding="utf8") as f:
+        f.writelines(data)
+
+
+def notify_file_has_data():
+    with open(notify_file_path, "r", encoding="utf8") as f:
+        return bool(f.readlines())
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="Valheim Server Query Util",
     )
     parser.add_argument("-m", "--method", choices=["info", "players"])
     parser.add_argument("-r", "--return_format", choices=["exit_code", "json"])
-    parser.add_argument("-n", "--notify_file")
+    parser.add_argument("-n", "--notify", action="store_true")
     args = parser.parse_args()
     notify_file_name = args.notify_file
     try:
         res = get_server_info(args.method or "info")
-        with open(notify_file_name, "w", encoding="utf8") as f:
-            f.writelines([])
+        write_notify_file([])
         if args.return_format == "exit_code":
             sys.exit(0)
         elif args.return_format == "json":
             print(json.dumps(dict(res)))
     except Exception as e:
-        if notify_file_name:
-            with open(notify_file_name, "r", encoding="utf8") as f:
-                lines = f.readlines()
-                already_notified = bool(lines)
-            if not already_notified:
-                res = send_discord_message(
-                    f"[THIS IS A TEST MESSAGE] <@{ANTHONY_ID}>: Looks like the server is down!  (Also, <@{DANNY_ID}> pay attention, in case I am malfunctioning)"
-                )
-
-                with open(notify_file_name, "w", encoding="utf8") as f:
-                    if res.status_code == 204:
-                        f.writelines([datetime.datetime.now().isoformat()])
-                    else:
-                        f.writelines([])
+        already_notified = notify_file_has_data()
+        if not args.notify and not already_notified:
+            res = send_discord_message(
+                f"<@{ANTHONY_ID}>: Looks like the server is down!  (Also, <@{DANNY_ID}> pay attention, in case I am malfunctioning)"
+            )
+            if res.status_code == 204:
+                # if the discord message succeeds, note that in a file so we don't ping constantly
+                write_notify_file([datetime.datetime.now().isoformat()])
+            else:
+                # if it fails, hope it succeeds next time I guess?  should have some fallback thing but eh
+                write_notify_file([])
 
         sys.exit(1)
