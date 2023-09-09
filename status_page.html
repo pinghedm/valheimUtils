@@ -44,6 +44,7 @@
     </style>
     <body>
         <h1>GamePals Valheim Status Page</h1>
+        <h2 id="loading">Querying Server...</h2>
         <h2 id="server-down">
             It looks like the Server is Down! Let Anthony know if the discord
             bot hasn't already.
@@ -67,6 +68,7 @@
         const getInfo = async () => {
             const res = await fetch("http://127.0.0.1:8000/get_info");
             const data = await res.json();
+            setDisplay('loading', 'none')
             if (data.serverUp) {
                 setDisplay('#server-up', 'block')
                 setDisplay('#server-down', 'none')
