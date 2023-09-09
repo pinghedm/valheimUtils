@@ -1,5 +1,7 @@
 <html>
-    <head> </head>
+    <head>
+        <title>Valheim Server Status</title>
+    </head>
     <style>
         body {
             max-width: 650px;
@@ -59,39 +61,38 @@
     </body>
 
     <script>
-
         const setDisplay = (id, val) => {
-            document.querySelectorAll(id).forEach(el => {el.style.display = val})
-        }
-
+            document.querySelectorAll(id).forEach((el) => {
+                el.style.display = val;
+            });
+        };
 
         const getInfo = async () => {
             const res = await fetch("http://127.0.0.1:8000/get_info");
             const data = await res.json();
-            setDisplay('#loading', 'none')
+            setDisplay("#loading", "none");
             if (data.serverUp) {
-                setDisplay('#server-up', 'block')
-                setDisplay('#server-down', 'none')
+                setDisplay("#server-up", "block");
+                setDisplay("#server-down", "none");
             } else {
-                setDisplay('#server-up', 'none')
-                setDisplay('#server-down', 'block')
-                setDisplay('#players', 'none')
-                setDisplay('#no-players', 'none')
+                setDisplay("#server-up", "none");
+                setDisplay("#server-down", "block");
+                setDisplay("#players", "none");
+                setDisplay("#no-players", "none");
             }
 
             if (data.numPlayers) {
-                setDisplay('#players', 'block')
-                setDisplay('#no-players', 'none')
+                setDisplay("#players", "block");
+                setDisplay("#no-players", "none");
                 document.querySelectorAll("#player-count").forEach((el) => {
                     el.innerHTML = data.numPlayers;
                 });
             } else if (!data.numPlayers && data.serverUp) {
-                setDisplay('#players', 'none')
-                setDisplay('#no-players', 'block')
+                setDisplay("#players", "none");
+                setDisplay("#no-players", "block");
             }
         };
-        getInfo()
-        setInterval(getInfo, 1000*60*5)
-        
+        getInfo();
+        setInterval(getInfo, 1000 * 60 * 5);
     </script>
 </html>
