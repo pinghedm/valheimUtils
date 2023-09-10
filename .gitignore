@@ -2,3 +2,4 @@ valcord/
 private_data.py
 __pycache__/
 dist/*
+.task/
