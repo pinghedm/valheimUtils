@@ -33,14 +33,33 @@ def get_server_info(func_name="info", ret_attr=None):
     return ret
 
 
-def write_notify_file(data):
-    with open(notify_file_path, "w", encoding="utf8") as f:
-        f.writelines(data)
-
-
-def notify_file_has_data():
+def time_to_post(notify_after):
+    if notify_after is None:
+        return False
+    num_fails_recorded = 0
     with open(notify_file_path, "r", encoding="utf8") as f:
-        return bool(f.readlines())
+        for l in f.readlines():
+            if l.startswith("POSTED"):
+                return False
+            if l.startswith("FAILURE"):
+                num_fails_recorded += 1
+
+    return num_fails_recorded >= notify_after
+
+
+def record_connection_failure():
+    with open(notify_file_path, "a", encoding="utf8") as f:
+        f.writelines([f"FAILURE: {datetime.datetime.now().isoformat()}\n"])
+
+
+def record_successful_post():
+    with open(notify_file_path, "a", encoding="utf8") as f:
+        f.writelines([f"POSTED: {datetime.datetime.now().isoformat()}\n"])
+
+
+def clear_notify_file():
+    with open(notify_file_path, "w", encoding="utf8") as f:
+        f.writelines([])
 
 
 if __name__ == "__main__":
@@ -49,26 +68,24 @@ if __name__ == "__main__":
     )
     parser.add_argument("-m", "--method", choices=["info", "players"])
     parser.add_argument("-r", "--return_format", choices=["exit_code", "json"])
-    parser.add_argument("-n", "--notify", action="store_true")
+    parser.add_argument("-n", "--notify-after", type=int)
     args = parser.parse_args()
     try:
         res = get_server_info(args.method or "info")
-        write_notify_file([])
+        clear_notify_file()
         if args.return_format == "exit_code":
             sys.exit(0)
         elif args.return_format == "json":
             print(json.dumps(dict(res)))
     except Exception as e:
-        already_notified = notify_file_has_data()
-        if args.notify and not already_notified:
+        record_connection_failure()
+        if time_to_post(args.notify_after):
             res = send_discord_message(
                 f"<@{ANTHONY_ID}>: Looks like the server is down!  (Also, <@{DANNY_ID}> pay attention, in case I am malfunctioning)"
             )
             if res.status_code == 204:
-                # if the discord message succeeds, note that in a file so we don't ping constantly
-                write_notify_file([datetime.datetime.now().isoformat()])
-            else:
-                # if it fails, hope it succeeds next time I guess?  should have some fallback thing but eh
-                write_notify_file([])
+                # if the post to discord succeeds, note that so we stop notifying
+                # else well see the fail count on the next go round and try again
+                record_successful_post()
 
         sys.exit(1)
