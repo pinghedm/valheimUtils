@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 import bottle
 from bottle_cors_plugin import cors_plugin
@@ -34,6 +35,9 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+    # weird hack: the args were being parsed by argparse but then also passed to bottle, which doesnt have the same args
+    # im sure theres a right way to do this but
+    sys.argv = ["status_page.py"]
     app.run(
         host="localhost",
         port=args.port,
