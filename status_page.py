@@ -1,7 +1,9 @@
+import argparse
+
 import bottle
-from a2s_util import get_server_info
 from bottle_cors_plugin import cors_plugin
-import private_data
+
+from a2s_util import get_server_info
 
 app = bottle.app()
 app.install(cors_plugin("*"))
@@ -20,9 +22,22 @@ def get_info():
     return ret_data
 
 
-app.run(
-    host="localhost",
-    port=getattr(private_data, "port_to_run_server_on", 8000),
-    server="gunicorn",
-    workers=2,
-)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(prog="Valheim Status Server")
+    parser.add_argument("-s", "--server-type", default="auto", choices=["gunicorn"])
+    parser.add_argument("-w", "--workers", type=int, default=1)
+    parser.add_argument("-r", "--auto-reload", action="store_true", default=False)
+    parser.add_argument(
+        "-p",
+        "--port",
+        default=8000,
+    )
+
+    args = parser.parse_args()
+    app.run(
+        host="localhost",
+        port=args.port,
+        server=args.server_type,
+        workers=args.workers,
+        reloader=args.auto_reload,
+    )

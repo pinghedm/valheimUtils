@@ -1,0 +1,44 @@
+version: "3"
+
+tasks:
+  # local commands
+  up:
+    desc: Run local dev servers
+    deps: [backend, frontend]
+
+  backend:
+    desc: Run Backend Server
+    cmds:
+      - python status_page.py -p 8000 -w 1 -r
+
+  frontend:
+    desc: Run Frontend Server
+    cmds:
+      - python -m http.server 8001
+
+  # build commands
+
+  build_fe:
+    desc: Build The Frontend
+    cmds:
+      - mkdir -p dist
+      - sed 's/http:\/\/127.0.0.1:8000/https:\/\/dannypinghero.me\/valheim_api/g' status_page.html > dist/status_page.html
+    sources:
+      - status_page.html
+    generates:
+      - dist/status_page.html
+
+  # deploy commands
+
+  deploy_be:
+    desc: Deploy Backend
+    cmds:
+      - scp a2s_util.py do-box:/home/danny/valheim
+      - scp status_page.py do-box:/home/danny/valheim
+      - ssh do-box -C "sudo systemctl restart valheim.service"
+
+  deploy_fe:
+    desc: Deploy Frontend
+    deps: [build_fe]
+    cmds:
+      - rsync -r dist/* do-box:/var/www/html/valheim --rsync-path="sudo rsync" --delete-after
