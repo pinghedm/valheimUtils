@@ -25,4 +25,7 @@ notify_file_path = "/tmp/valheim_notify_status"  (or whatever file you want, mak
     - start the backend with `python status_page.py`  you probably want to add -r, for autoreload, while developing, if working on the server
 - you may wish to install Task [https://taskfile.dev/installation/] to make use of the Taskfile in the repo.
 - in that case you can run `task up` to run both, or `task backend` or `task frontend` to run either
+    - the frontend task will serve on port 8001 - open localhost:8001/status_page.html
+    - the backend task will serve on port 8000
+        - I suppose we could make the task file read an env file or take args if you wanted different ones
 - the task file also have some deploy tasks that are hard coded to put the files where I want them on my server; if you wanted to deploy this somewhere you're welcome to adapt it using your own task includes
