@@ -22,7 +22,7 @@ tasks:
     desc: Build The Frontend
     cmds:
       - mkdir -p dist
-      - sed 's/http:\/\/127.0.0.1:8000/https:\/\/dannypinghero.me\/valheim_api/g' status_page.html > dist/status_page.html
+      - sed 's/http:\/\/127.0.0.1:8000/https:\/\/dannypinghero.me\/valheim_api/g' status_page.html > dist/index.html
     sources:
       - status_page.html
     generates:
