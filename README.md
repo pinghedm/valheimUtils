@@ -7,7 +7,7 @@
     - a bottle server for providing an http interface to the query tool
     - a webpage that queries the bottle server
 
-## To Run Webservice Locally
+### To Run Webservice Locally
 
 - you'll need to write a private_data.py file in the repo root.  It should look something like
 
