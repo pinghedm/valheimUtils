@@ -6,10 +6,13 @@ tasks:
     cmds:
       - mkdir -p dist
       - sed 's/http:\/\/127.0.0.1:8000/https:\/\/dannypinghero.me\/valheim_api/g' status_page.html > dist/index.html
+      - cp -r assets dist
     sources:
       - status_page.html
+      - assets/
     generates:
       - dist/status_page.html
+      - dist/assets/
 
   # deploy commands
 
